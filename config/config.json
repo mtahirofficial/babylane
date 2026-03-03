@@ -1,0 +1,33 @@
+{
+  "development": {
+    "username": "root",
+    "password": null,
+    "database": "bl",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "logging": false,
+    "define": {
+      "raw": true
+    }
+  },
+  "test": {
+    "username": "logicsar_scc",
+    "password": "!kH)s]c@U.8j",
+    "database": "logicsar_devrates",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "define": {
+      "raw": true
+    }
+  },
+  "production": {
+    "username": "logicsar_shippingcostcalculator_user",
+    "password": "4S6iP6J)e9^}",
+    "database": "logicsar_shippingcostcalculator",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "define": {
+      "raw": true
+    }
+  }
+}

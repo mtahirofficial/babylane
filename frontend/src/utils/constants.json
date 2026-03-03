@@ -1,0 +1,28 @@
+{
+    "traits": {
+        "brave": "BR",
+        "smart": "SM",
+        "kind": "KD",
+        "happy": "HP",
+        "creative": "CR",
+        "star": "ST",
+        "super": "SP",
+        "friendly": "FR"
+    },
+    "items": {
+        "t-shirt": "TS",
+        "frock": "FR",
+        "hoodie": "HD",
+        "pajama": "PJ",
+        "set": "ST"
+    },
+    "colors": {
+        "blue": "BL",
+        "pink": "PK",
+        "yellow": "YL",
+        "red": "RD",
+        "green": "GN",
+        "white": "WH",
+        "black": "BK"
+    }
+}
