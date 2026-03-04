@@ -21,9 +21,9 @@
     }
   },
   "production": {
-    "username": "logicsar_shippingcostcalculator_user",
-    "password": "4S6iP6J)e9^}",
-    "database": "logicsar_shippingcostcalculator",
+    "username": "u285439240_bl",
+    "password": "*Z7ejqCvy",
+    "database": "u285439240_bl",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "define": {

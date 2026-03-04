@@ -63,7 +63,7 @@ class AppServer {
 
     loadSSRView() {
         this._app.use("/assets", express.static(join(__dirname, "./frontend/dist/assets")));
-        this._app.get("/*", (req, res) => {
+        this._app.get("/{*path}", (req, res) => {
             res.sendFile('index.html', { root: path.join(__dirname, './frontend/dist/') }, err => {
                 if (err) res.send(`<div style="text-align: center;font-size: xxx-large;color: red;margin-top: 100px;">Maintenance in progress...</div><div style="text-align: center;font-size: 16px;color: red;margin-top: 20px;">Checkout is functional just app dashboard in maintenance.</div>`);
                 res.end();
