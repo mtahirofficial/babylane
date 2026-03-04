@@ -26,7 +26,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: 'Variant'
+      modelName: 'Variant',
+      tableName: 'Variants',
+      freezeTableName: true
     }
   );
 
