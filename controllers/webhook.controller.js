@@ -1,8 +1,8 @@
 const express = require("express");
-const fs = require("fs/promises");
-const path = require("path");
+const crypto = require("crypto");
 const models = require("../models");
 const { WooWebhookAuthMiddleware } = require("../middleware");
+const { persistWebhookDebugPayload } = require("../utils");
 
 const { Customer, Order, OrderItem, Product, Variant } = models;
 
@@ -124,17 +124,41 @@ class WebhookController {
         this.initializeRoutes();
     }
 
-    async persistWebhookPayload(data) {
-        const webhookDir = path.join(process.cwd(), "webhooks");
-        await fs.mkdir(webhookDir, { recursive: true });
-        const fileName = `webhook-${Date.now()}.json`;
-        const filePath = path.join(webhookDir, fileName);
-        await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
+    async persistWebhookPayload(data, req, extra = {}) {
+        const secret = process.env.WC_WEBHOOK_SECRET || "";
+        const rawBody = Buffer.isBuffer(req?.rawBody) ? req.rawBody : null;
+        const payloadAsString = JSON.stringify(data || {});
+        const signatureHeader = req?.get?.("x-wc-webhook-signature") || null;
+        const expectedFromRaw = rawBody && secret
+            ? crypto.createHmac("sha256", secret).update(rawBody).digest("base64")
+            : null;
+        const expectedFromParsed = secret
+            ? crypto.createHmac("sha256", secret).update(Buffer.from(payloadAsString, "utf8")).digest("base64")
+            : null;
+
+        const filePath = await persistWebhookDebugPayload({
+            prefix: "webhook",
+            req,
+            data,
+            extra: {
+                ...extra,
+                signatureDebug: {
+                    secretConfigured: Boolean(secret),
+                    headerLength: signatureHeader ? signatureHeader.length : 0,
+                    expectedFromRawLength: expectedFromRaw ? expectedFromRaw.length : 0,
+                    expectedFromParsedLength: expectedFromParsed ? expectedFromParsed.length : 0,
+                    matchesRaw: Boolean(signatureHeader && expectedFromRaw && signatureHeader === expectedFromRaw),
+                    matchesParsed: Boolean(signatureHeader && expectedFromParsed && signatureHeader === expectedFromParsed),
+                    expectedFromRawPreview: expectedFromRaw ? `${expectedFromRaw.slice(0, 10)}...` : null,
+                    expectedFromParsedPreview: expectedFromParsed ? `${expectedFromParsed.slice(0, 10)}...` : null
+                }
+            }
+        });
         return filePath;
     }
 
     async processProductWebhook(data, req, res) {
-        const filePath = await this.persistWebhookPayload(data);
+        const filePath = await this.persistWebhookPayload(data, req, { handler: "product-upsert" });
         console.log("[WooWebhook] Request saved to file", { filePath });
 
         if (!data || !data.id) {
@@ -164,8 +188,8 @@ class WebhookController {
     }
 
     async processProductDeletedWebhook(data, req, res) {
-        // const filePath = await this.persistWebhookPayload(data);
-        // console.log("[WooWebhook] Request saved to file", { filePath });
+        const filePath = await this.persistWebhookPayload(data, req, { handler: "product-deleted" });
+        console.log("[WooWebhook] Request saved to file", { filePath });
 
         const productId = toNumber(data?.id, null);
         if (!productId) {
@@ -247,6 +271,9 @@ class WebhookController {
     }
 
     async processOrderWebhook(data, req, res) {
+        const filePath = await this.persistWebhookPayload(data, req, { handler: "order-upsert" });
+        console.log("[WooWebhook] Request saved to file", { filePath });
+
         if (!data || !data.id) {
             return res.status(400).json({ success: false, message: "Invalid payload: order id is required" });
         }
@@ -282,6 +309,9 @@ class WebhookController {
     }
 
     async processOrderDeletedWebhook(data, req, res) {
+        const filePath = await this.persistWebhookPayload(data, req, { handler: "order-deleted" });
+        console.log("[WooWebhook] Request saved to file", { filePath });
+
         const orderId = toNumber(data?.id, null);
         if (!orderId) {
             return res.status(400).json({ success: false, message: "Invalid payload: order id is required" });

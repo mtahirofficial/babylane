@@ -1,3 +1,5 @@
+const { persistWebhookDebugPayload } = require("./webhook-debug.util");
+
 function isObjectEmpty(obj = {}) {
   return !Object.keys(obj).length;
 }
@@ -148,5 +150,6 @@ module.exports = {
   getUniqueValues,
   sortMixedArray,
   sleep,
-  calculateReadTime
+  calculateReadTime,
+  persistWebhookDebugPayload
 };
