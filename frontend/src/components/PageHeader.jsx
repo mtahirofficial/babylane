@@ -5,9 +5,9 @@ export default function PageHeader({ title, onPrimaryClick, primaryLabel = "Add"
         <div className="title-bar">
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <h2 className="page-title">{title}</h2>
-                {actions}
             </div>
-            <div>
+            <div  style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {actions}
                 {onPrimaryClick && (
                     <button className="btn-primary btn small-btn" onClick={onPrimaryClick}>
                         {primaryLabel}

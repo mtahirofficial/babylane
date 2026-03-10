@@ -19,11 +19,23 @@ function toNumber(value, fallback = 0) {
 }
 
 function mapProductPayload(data) {
+    const variants = Array.isArray(data?.variants) ? data.variants : [];
+    const pickFromVariants = (key) => {
+        for (const variant of variants) {
+            if (!variant) continue;
+            const value = variant[key];
+            if (value !== undefined && value !== null && value !== "") return value;
+        }
+        return null;
+    };
+
     return {
         id: toNumber(data.id, null),
         title: data.title || null,
         slug: data.slug || null,
         sku: data.sku || null,
+        purchase_price: pickFromVariants("purchase_price"),
+        regular_price: pickFromVariants("regular_price"),
         description: data.description || null,
         short_description: data.short_description || null,
         status: data.status || null,
@@ -168,6 +180,8 @@ class WebhookController {
         const t = await models.sequelize.transaction();
         try {
             const productPayload = mapProductPayload(data);
+            console.log("productPayload", productPayload);
+
             await Product.upsert(productPayload, { transaction: t });
 
             const variants = Array.isArray(data.variants) ? data.variants : [];

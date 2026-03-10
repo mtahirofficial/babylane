@@ -59,6 +59,12 @@ function parseJsonArray(value, fallback = []) {
     return fallback;
 }
 
+function parseNumber(value, fallback = null) {
+    if (value === undefined || value === null || value === "") return fallback;
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? fallback : parsed;
+}
+
 function parseProduct(body, file, req) {
     let featured_image = body.featured_image || "";
     const parsedId = Number(body.id);
@@ -71,6 +77,8 @@ function parseProduct(body, file, req) {
         title: body.title || null,
         slug: body.slug || null,
         sku: body.sku || null,
+        purchase_price: parseNumber(body.purchase_price, null),
+        regular_price: parseNumber(body.regular_price, null),
         description: body.description || null,
         short_description: body.short_description || null,
         status: body.status || "active",

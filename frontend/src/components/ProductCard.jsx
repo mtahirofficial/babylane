@@ -12,8 +12,12 @@ const ProductCard = ({ product }) => {
         product.image ||
         "/placeholder.png";
 
-    const price = Number(product.price);
+    const price = Number(product.price ?? product.sale_price);
     const hasPrice = !Number.isNaN(price) && price > 0;
+    const regularPrice = Number(product.regular_price);
+    const hasRegularPrice = !Number.isNaN(regularPrice) && regularPrice > 0;
+    const purchasePrice = Number(product.purchase_price);
+    const hasPurchasePrice = !Number.isNaN(purchasePrice) && purchasePrice > 0;
     const stock = Number(product.stock_quantity);
     const safeStock = Number.isNaN(stock) ? 0 : stock;
     const summary = (product.short_description || "")
@@ -60,7 +64,15 @@ const ProductCard = ({ product }) => {
                 </div>
                 <span className={`product-badge ${badge.className}`}>{badge.label}</span>
                 <p className="product-sku">SKU: {product.sku}</p>
-                <p className="product-price">{hasPrice ? `${currency}${price.toFixed(2)}` : "Price: N/A"}</p>
+                <p className="product-price">
+                    {hasPrice ? `Sale Price: ${currency}${price.toFixed(2)}` : "Sale Price: N/A"}
+                </p>
+                <p className="product-price">
+                    {hasRegularPrice ? `Regular Price: ${currency}${regularPrice.toFixed(2)}` : "Regular Price: N/A"}
+                </p>
+                <p className="product-price">
+                    {hasPurchasePrice ? `Purchase Price: ${currency}${purchasePrice.toFixed(2)}` : "Purchase Price: N/A"}
+                </p>
                 <p className="product-inventory">
                     Inventory: {safeStock} ({product.stock_status || "unknown"})
                 </p>

@@ -8,24 +8,40 @@ const ProductPage = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("active");
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await api.get("/products");
-        setProducts(res.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
+  const fetchProducts = async ({ isRefresh = false } = {}) => {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      const res = await api.get("/products");
+      setProducts(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      if (isRefresh) {
+        setRefreshing(false);
+      } else {
         setLoading(false);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     fetchProducts();
   }, []);
 
   const handleAddProduct = () => {
     navigate("/products/add");
+  };
+
+  const handleRefresh = () => {
+    fetchProducts({ isRefresh: true });
   };
 
   const getStatusMeta = (product) => {
@@ -53,7 +69,21 @@ const ProductPage = () => {
 
   return (
     <div className="page-container">
-      <PageHeader title="Products" onPrimaryClick={handleAddProduct} primaryLabel="Add Product" />
+      <PageHeader
+        title="Products"
+        onPrimaryClick={handleAddProduct}
+        primaryLabel="Add Product"
+        actions={(
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleRefresh}
+            disabled={refreshing || loading}
+          >
+            {refreshing ? "Refreshing..." : "Refresh"}
+          </button>
+        )}
+      />
       <div className="product-filters">
         {filterTabs.map((tab) => (
           <button

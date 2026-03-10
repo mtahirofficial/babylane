@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       slug: DataTypes.STRING,
       sku: DataTypes.STRING,
+      purchase_price: DataTypes.DECIMAL(10, 2),
+      regular_price: DataTypes.DECIMAL(10, 2),
       description: DataTypes.TEXT('long'),
       short_description: DataTypes.TEXT,
       status: DataTypes.STRING,
